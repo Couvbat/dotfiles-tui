@@ -185,6 +185,19 @@ go mod download
 3. Verify you have sufficient disk space
 4. Make sure you're running with appropriate permissions
 
+### Permission Issues
+
+If you get "Permission denied" errors:
+
+```bash
+# Fix all permissions at once
+./fix-permissions.sh
+
+# Or manually:
+chmod +x *.sh
+chmod +x dotfiles-installer
+```
+
 ### Graphics Driver Issues
 
 - Only select one graphics driver option

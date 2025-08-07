@@ -25,6 +25,9 @@ if [ ! -f "dotfiles-installer" ]; then
         echo "❌ Failed to build installer"
         exit 1
     fi
+else
+    # Ensure installer is executable
+    chmod +x dotfiles-installer
 fi
 
 # Run the installer

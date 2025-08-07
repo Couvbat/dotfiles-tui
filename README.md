@@ -19,7 +19,13 @@ You can find the Hyprland installation instructions here: https://wiki.hyprland.
 ```shell
 git clone https://github.com/Couvbat/dotfiles.git
 cd dotfiles
+
+# Fix permissions (if needed on Linux)
+chmod +x *.sh
+
+# Build and run
 go build -o dotfiles-installer .
+chmod +x dotfiles-installer
 ./dotfiles-installer
 ```
 
@@ -28,6 +34,9 @@ go build -o dotfiles-installer .
 ```shell
 git clone https://github.com/Couvbat/dotfiles.git
 cd dotfiles
+
+# Fix permissions and run
+chmod +x *.sh
 ./install-tui.sh
 ```
 

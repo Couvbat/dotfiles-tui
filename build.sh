@@ -24,7 +24,10 @@ echo "Building application..."
 go build -o dotfiles-installer main.go
 
 if [ $? -eq 0 ]; then
+    # Make the installer executable
+    chmod +x dotfiles-installer
     echo "✅ Build successful!"
+    echo "✅ Installer made executable"
     echo ""
     echo "Run the installer with: ./dotfiles-installer"
     echo ""
