@@ -3,9 +3,9 @@
 # =============================================================================
 # VIRTUALIZATION TOOLS INSTALLATION SCRIPT
 # =============================================================================
-# Description: Install and configure virtualization platforms and tools
-# This script provides functions to install QEMU/KVM, VirtualBox, VMware tools,
-# and other virtualization-related software.
+# Description: Install and configure QEMU/KVM virtualization and Wine
+# This script provides functions to install QEMU/KVM with virt-manager
+# and Wine for Windows application compatibility.
 # =============================================================================
 
 # Function to install QEMU/KVM with virt-manager
@@ -47,6 +47,14 @@ install_qemu_kvm() {
             echo "ℹ️  Nested virtualization may be available - check system configuration"
         fi
         
+        # Check virtualization support
+        if grep -E "(vmx|svm)" /proc/cpuinfo >/dev/null; then
+            echo "✅ Hardware virtualization support detected"
+        else
+            echo "⚠️  Warning: Hardware virtualization not detected"
+            echo "ℹ️  Enable VT-x/AMD-V in BIOS settings for better performance"
+        fi
+        
     else
         echo "❌ Failed to install QEMU/KVM packages"
         FAILED_STEPS+=("QEMU/KVM installation failed")
@@ -54,143 +62,57 @@ install_qemu_kvm() {
     fi
 }
 
-# Function to install VirtualBox
-install_virtualbox() {
-    echo "🔧 Installing VirtualBox..."
+# Function to install VirtualBox Guest Additions (for running inside VirtualBox VMs)
+install_virtualbox_guest() {
+    echo "🔧 Installing VirtualBox Guest Additions..."
     
-    local vbox_packages=(
-        "virtualbox"            # VirtualBox main package
-        "virtualbox-host-modules-arch"  # Kernel modules for Arch
-        "virtualbox-guest-iso"  # Guest additions ISO
+    # Check if we're running in VirtualBox
+    local virt_type=$(systemd-detect-virt 2>/dev/null || echo "none")
+    if [[ "$virt_type" != "oracle" ]] && [[ "$virt_type" != "virtualbox" ]]; then
+        echo "⚠️  Warning: Not running in VirtualBox VM, but installing anyway"
+        echo "ℹ️  VirtualBox Guest Additions will be available if you migrate to VirtualBox"
+    else
+        echo "✅ VirtualBox environment detected"
+    fi
+    
+    local vbox_guest_packages=(
+        "virtualbox-guest-utils"    # VirtualBox guest utilities
+        "xf86-video-vmware"         # VMware/VirtualBox graphics driver
     )
     
-    if _installPackages "${vbox_packages[@]}"; then
-        echo "✅ VirtualBox packages installed successfully"
+    if _installPackages "${vbox_guest_packages[@]}"; then
+        echo "✅ VirtualBox Guest Additions installed successfully"
         
-        # Add user to vboxusers group
-        if sudo usermod -aG vboxusers "$USER"; then
-            echo "✅ User added to vboxusers group"
+        # Enable VirtualBox guest services
+        enable_service "vboxservice.service"
+        
+        # Load VirtualBox guest kernel modules
+        if sudo modprobe vboxguest vboxsf vboxvideo; then
+            echo "✅ VirtualBox guest kernel modules loaded"
+        else
+            echo "⚠️  Warning: Failed to load VirtualBox guest kernel modules"
+            echo "ℹ️  Modules will be loaded automatically on next boot"
+        fi
+        
+        # Add user to vboxsf group for shared folder access
+        if sudo usermod -aG vboxsf "$USER"; then
+            echo "✅ User added to vboxsf group for shared folder access"
             echo "ℹ️  You may need to log out and back in for group changes to take effect."
         else
-            echo "⚠️  Warning: Failed to add user to vboxusers group"
-            FAILED_STEPS+=("Failed to add user to vboxusers group")
+            echo "⚠️  Warning: Failed to add user to vboxsf group"
         fi
         
-        # Load VirtualBox kernel modules
-        if sudo modprobe vboxdrv vboxnetadp vboxnetflt vboxpci; then
-            echo "✅ VirtualBox kernel modules loaded"
-        else
-            echo "⚠️  Warning: Failed to load VirtualBox kernel modules"
-            echo "ℹ️  You may need to reboot for kernel modules to work properly"
-        fi
+        echo "ℹ️  VirtualBox Guest Additions features:"
+        echo "   • Improved graphics performance and resolution"
+        echo "   • Mouse pointer integration"
+        echo "   • Shared folders between host and guest"
+        echo "   • Clipboard sharing"
+        echo "   • Time synchronization"
         
     else
-        echo "❌ Failed to install VirtualBox packages"
-        FAILED_STEPS+=("VirtualBox installation failed")
+        echo "❌ Failed to install VirtualBox Guest Additions"
+        FAILED_STEPS+=("VirtualBox Guest Additions installation failed")
         return 1
-    fi
-}
-
-# Function to install VMware Workstation support tools
-install_vmware_tools() {
-    echo "🔧 Installing VMware tools and utilities..."
-    
-    # Note: VMware Workstation itself is proprietary and must be installed manually
-    # This installs open-source tools for VMware compatibility
-    
-    local vmware_packages=(
-        "open-vm-tools"         # Open-source VMware tools
-        "gtkmm3"               # GUI toolkit for VMware tools
-    )
-    
-    if _installPackages "${vmware_packages[@]}"; then
-        echo "✅ VMware tools installed successfully"
-        
-        # Enable VMware services if running in VMware
-        if systemd-detect-virt | grep -q vmware; then
-            enable_service "vmtoolsd.service"
-            enable_service "vmware-vmblock-fuse.service"
-            echo "✅ VMware services enabled (detected VMware environment)"
-        else
-            echo "ℹ️  VMware tools installed but not running in VMware environment"
-        fi
-        
-    else
-        echo "❌ Failed to install VMware tools"
-        FAILED_STEPS+=("VMware tools installation failed")
-        return 1
-    fi
-}
-
-# Function to install container runtimes (complementary to virtualization)
-install_container_runtimes() {
-    echo "🔧 Installing additional container runtimes..."
-    
-    local container_packages=(
-        "podman"                # Daemonless container engine
-        "buildah"               # Container image builder
-        "skopeo"                # Container image operations
-        "crun"                  # Fast OCI runtime
-        "fuse-overlayfs"        # User-space overlay filesystem
-    )
-    
-    if _installPackages "${container_packages[@]}"; then
-        echo "✅ Container runtimes installed successfully"
-        
-        # Configure rootless containers for current user
-        if ! grep -q "^$USER:" /etc/subuid; then
-            echo "$USER:100000:65536" | sudo tee -a /etc/subuid >/dev/null
-            echo "$USER:100000:65536" | sudo tee -a /etc/subgid >/dev/null
-            echo "✅ Configured rootless container support"
-        else
-            echo "✅ Rootless container support already configured"
-        fi
-        
-    else
-        echo "❌ Failed to install container runtimes"
-        FAILED_STEPS+=("Container runtimes installation failed")
-        return 1
-    fi
-}
-
-# Function to install virtualization development tools
-install_virt_dev_tools() {
-    echo "🔧 Installing virtualization development tools..."
-    
-    local dev_packages=(
-        "vagrant"               # Development environment manager
-        "packer"                # Machine image builder
-        "terraform"             # Infrastructure as code
-        "ansible"               # Configuration management
-    )
-    
-    # These are typically AUR packages, check if paru is available
-    if ! _checkCommandExists "paru"; then
-        echo "⚠️  Warning: paru not available, skipping AUR virtualization tools"
-        echo "ℹ️  Install paru first to get Vagrant, Packer, Terraform, and Ansible"
-        return 0
-    fi
-    
-    local failed_packages=()
-    for package in "${dev_packages[@]}"; do
-        if ! _isInstalled "$package"; then
-            echo "📦 Installing $package..."
-            if paru -S --needed --noconfirm "$package"; then
-                echo "✅ $package installed successfully"
-            else
-                echo "❌ Failed to install $package"
-                failed_packages+=("$package")
-            fi
-        else
-            echo "✅ $package is already installed"
-        fi
-    done
-    
-    if [[ ${#failed_packages[@]} -gt 0 ]]; then
-        echo "⚠️  Some virtualization dev tools failed to install: ${failed_packages[*]}"
-        FAILED_STEPS+=("Virtualization dev tools: ${failed_packages[*]}")
-    else
-        echo "✅ All virtualization development tools installed successfully"
     fi
 }
 
@@ -213,42 +135,5 @@ install_wine() {
         echo "❌ Failed to install Wine packages"
         FAILED_STEPS+=("Wine installation failed")
         return 1
-    fi
-}
-
-# Function to check virtualization support
-check_virtualization_support() {
-    echo "🔍 Checking virtualization support..."
-    
-    # Check if hardware virtualization is enabled
-    if grep -E "(vmx|svm)" /proc/cpuinfo >/dev/null; then
-        echo "✅ Hardware virtualization support detected"
-        
-        # Check specific CPU features
-        if grep -q "vmx" /proc/cpuinfo; then
-            echo "ℹ️  Intel VT-x support available"
-        fi
-        if grep -q "svm" /proc/cpuinfo; then
-            echo "ℹ️  AMD SVM support available"
-        fi
-    else
-        echo "⚠️  Warning: Hardware virtualization not detected"
-        echo "ℹ️  Enable VT-x/AMD-V in BIOS settings for better performance"
-    fi
-    
-    # Check if KVM is available
-    if [[ -r /dev/kvm ]]; then
-        echo "✅ KVM device available"
-    else
-        echo "⚠️  Warning: KVM device not available"
-        echo "ℹ️  KVM kernel modules may need to be loaded"
-    fi
-    
-    # Check current virtualization environment
-    local virt_type=$(systemd-detect-virt 2>/dev/null || echo "none")
-    if [[ "$virt_type" != "none" ]]; then
-        echo "ℹ️  Running in virtualization environment: $virt_type"
-    else
-        echo "ℹ️  Running on bare metal"
     fi
 }

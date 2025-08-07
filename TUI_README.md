@@ -47,12 +47,8 @@ A beautiful Terminal User Interface (TUI) installer for your dotfiles, built wit
 
 ### Virtualization
 - QEMU/KVM - Complete virtualization stack with virt-manager GUI
-- VirtualBox - Oracle VirtualBox with host modules and kernel support
-- VMware Tools - Open-source VMware tools for compatibility
-- Container Runtimes - Podman, Buildah, and rootless container support
-- Virtualization Dev Tools - Vagrant, Packer, Terraform, Ansible (AUR packages)
+- VirtualBox Guest Additions - Graphics drivers and tools for VirtualBox VMs
 - Wine - Windows application compatibility layer
-- Virtualization Support Check - Verify hardware capabilities
 
 ### Terminal Applications
 - Terminal Emulator (Kitty) - GPU-accelerated terminal

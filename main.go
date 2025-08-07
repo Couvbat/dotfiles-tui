@@ -146,12 +146,8 @@ func initialModel() model {
 			Name: "Virtualization",
 			Steps: []InstallStep{
 				{Name: "QEMU/KVM", Description: "Complete virtualization stack with virt-manager GUI", Function: "install_qemu_kvm", Selected: false, Required: false},
-				{Name: "VirtualBox", Description: "Oracle VirtualBox with host modules", Function: "install_virtualbox", Selected: false, Required: false},
-				{Name: "VMware Tools", Description: "Open-source VMware tools and utilities", Function: "install_vmware_tools", Selected: false, Required: false},
-				{Name: "Container Runtimes", Description: "Podman, Buildah, and rootless containers", Function: "install_container_runtimes", Selected: false, Required: false},
-				{Name: "Virtualization Dev Tools", Description: "Vagrant, Packer, Terraform, Ansible", Function: "install_virt_dev_tools", Selected: false, Required: false},
+				{Name: "VirtualBox Guest Additions", Description: "Graphics drivers and tools for VirtualBox VMs", Function: "install_virtualbox_guest", Selected: false, Required: false},
 				{Name: "Wine", Description: "Windows application compatibility layer", Function: "install_wine", Selected: false, Required: false},
-				{Name: "Check Virtualization Support", Description: "Verify hardware virtualization capabilities", Function: "check_virtualization_support", Selected: true, Required: false},
 			},
 		},
 		{
