@@ -17,11 +17,12 @@ A beautiful Terminal User Interface (TUI) installer for your dotfiles, built wit
 - NVIDIA Drivers (proprietary with CUDA support)
 - AMD Drivers (open-source)
 - Intel Drivers (integrated graphics)
+- VirtualBox Guest Graphics (for VirtualBox VMs)
 
 ### Development Tools
 - Visual Studio Code
-- Neovim (included in core packages)
-- Git (included in core packages)
+- Neovim (modern Vim-based text editor)
+- Git (version control system)
 - Docker with docker-compose
 - Node.js and npm
 - MongoDB
@@ -47,7 +48,6 @@ A beautiful Terminal User Interface (TUI) installer for your dotfiles, built wit
 
 ### Virtualization
 - QEMU/KVM - Complete virtualization stack with virt-manager GUI
-- VirtualBox Guest Additions - Graphics drivers and tools for VirtualBox VMs
 - Wine - Windows application compatibility layer
 
 ### Terminal Applications
@@ -66,10 +66,16 @@ A beautiful Terminal User Interface (TUI) installer for your dotfiles, built wit
 - Calculator - GNOME calculator
 - Software Center (Discover) - KDE application manager
 - Bluetooth Manager (Blueman) - Graphical Bluetooth management
-- Text Editor (Neovim) - Modern Vim-based editor
 
 ### Entertainment
 - cmatrix - Terminal Matrix effect screensaver
+- cbonsai - ASCII art bonsai tree generator
+- pipes-rs - Terminal screensaver with animated pipes
+- astroterm - Terminal-based astronomy application
+
+### Wallpapers & Themes
+- Wallpapers - Setup wallpapers and background themes
+- Theming Support - Icons, themes, and appearance tools
 
 ### System Configuration
 - Core Packages (essential system packages) *[Required]*
@@ -83,12 +89,9 @@ A beautiful Terminal User Interface (TUI) installer for your dotfiles, built wit
 - File Manager Tools (system file management utilities)
 - Multimedia Base (audio/video control and image processing)
 - Bluetooth Support (core Bluetooth utilities)
-- Theming Support (icons, themes, and appearance tools)
 - Software Management (Flatpak support)
 - Fonts (essential and programming fonts)
 - Zsh Shell with plugins
-- Wallpapers and themes
-- Fastfetch system info tool
 - Dotfiles (configuration files) *[Required]*
 
 ## Usage
@@ -131,11 +134,18 @@ go build -o dotfiles-installer main.go
 ## Navigation
 
 - **Arrow Keys** or **hjkl**: Navigate through options
-- **←→**: Switch between categories
-- **↑↓**: Navigate within categories
+- **←→**: Switch between category tabs
+- **↑↓**: Navigate through packages in current category
 - **Space**: Toggle selection (for optional components)
 - **Enter**: Start installation
 - **q**: Quit
+
+## Interface
+
+The installer now features a **horizontal tab interface**:
+- **Category tabs** are displayed horizontally at the top
+- **Package list** is shown vertically for the selected category
+- Only one category is visible at a time for cleaner interface
 
 ## Legend
 

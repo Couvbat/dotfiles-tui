@@ -28,6 +28,19 @@ var (
 			Foreground(lipgloss.Color("#A1A1AA")).
 			Padding(0, 1)
 
+	tabActiveStyle = lipgloss.NewStyle().
+			Bold(true).
+			Background(lipgloss.Color("#7C3AED")).
+			Foreground(lipgloss.Color("#FFFFFF")).
+			Padding(0, 2).
+			MarginRight(1)
+
+	tabInactiveStyle = lipgloss.NewStyle().
+			Background(lipgloss.Color("#374151")).
+			Foreground(lipgloss.Color("#9CA3AF")).
+			Padding(0, 2).
+			MarginRight(1)
+
 	categoryStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#10B981")).
@@ -90,6 +103,7 @@ func initialModel() model {
 				{Name: "NVIDIA Drivers", Description: "Install NVIDIA drivers (will prompt for DKMS, Open, or Nouveau options)", Function: "configure_nvidia", Selected: false, Required: false},
 				{Name: "AMD Drivers", Description: "Install AMD open-source drivers with Vulkan support", Function: "configure_amd", Selected: false, Required: false},
 				{Name: "Intel Drivers", Description: "Install Intel integrated graphics drivers with Vulkan support", Function: "configure_intel", Selected: false, Required: false},
+				{Name: "VirtualBox Guest Graphics", Description: "Graphics drivers for VirtualBox VMs", Function: "install_virtualbox_guest", Selected: false, Required: false},
 			},
 		},
 		{
@@ -146,7 +160,6 @@ func initialModel() model {
 			Name: "Virtualization",
 			Steps: []InstallStep{
 				{Name: "QEMU/KVM", Description: "Complete virtualization stack with virt-manager GUI", Function: "install_qemu_kvm", Selected: false, Required: false},
-				{Name: "VirtualBox Guest Additions", Description: "Graphics drivers and tools for VirtualBox VMs", Function: "install_virtualbox_guest", Selected: false, Required: false},
 				{Name: "Wine", Description: "Windows application compatibility layer", Function: "install_wine", Selected: false, Required: false},
 			},
 		},
@@ -156,7 +169,7 @@ func initialModel() model {
 				{Name: "Terminal Emulator (Kitty)", Description: "Modern terminal emulator with GPU acceleration", Function: "install_terminal_emulator", Selected: true, Required: false},
 				{Name: "System Monitor (btop)", Description: "Resource monitor with modern interface", Function: "install_system_monitor", Selected: true, Required: false},
 				{Name: "bat", Description: "Better version of cat with syntax highlighting", Function: "install_bat", Selected: true, Required: false},
-				{Name: "Fastfetch", Description: "System information display tool", Function: "install_fastfetch_app", Selected: true, Required: false},
+				{Name: "Fastfetch", Description: "System information display tool", Function: "setup_fastfetch", Selected: true, Required: false},
 				{Name: "tldr", Description: "Simplified man pages with examples", Function: "install_tldr", Selected: true, Required: false},
 				{Name: "onefetch", Description: "Git repository information tool", Function: "install_onefetch", Selected: true, Required: false},
 			},
@@ -174,7 +187,6 @@ func initialModel() model {
 				{Name: "Calculator", Description: "GNOME calculator application", Function: "install_calculator", Selected: true, Required: false},
 				{Name: "Software Center (Discover)", Description: "KDE application for managing software", Function: "install_discover", Selected: false, Required: false},
 				{Name: "Bluetooth Manager (Blueman)", Description: "Graphical Bluetooth device manager", Function: "install_blueman", Selected: true, Required: false},
-				{Name: "Text Editor (Neovim)", Description: "Modern Vim-based text editor", Function: "install_neovim_app", Selected: true, Required: false},
 			},
 		},
 		{
@@ -184,6 +196,13 @@ func initialModel() model {
 				{Name: "cbonsai", Description: "ASCII art bonsai tree generator", Function: "install_cbonsai", Selected: false, Required: false},
 				{Name: "pipes-rs", Description: "Terminal screensaver with animated pipes", Function: "install_pipes_rs", Selected: false, Required: false},
 				{Name: "astroterm", Description: "Terminal-based astronomy application", Function: "install_astroterm", Selected: false, Required: false},
+			},
+		},
+		{
+			Name: "Wallpapers & Themes",
+			Steps: []InstallStep{
+				{Name: "Wallpapers", Description: "Setup wallpapers and themes", Function: "setup_wallpapers", Selected: true, Required: false},
+				{Name: "Theming Support", Description: "Icons, themes, and appearance tools", Function: "install_theming", Selected: true, Required: false},
 			},
 		},
 		{
@@ -200,12 +219,9 @@ func initialModel() model {
 				{Name: "File Manager Tools", Description: "System file management utilities", Function: "install_file_manager", Selected: true, Required: false},
 				{Name: "Multimedia Base", Description: "Audio/video control and image processing", Function: "install_multimedia_base", Selected: true, Required: false},
 				{Name: "Bluetooth Support", Description: "Core Bluetooth utilities", Function: "install_bluetooth", Selected: true, Required: false},
-				{Name: "Theming Support", Description: "Icons, themes, and appearance tools", Function: "install_theming", Selected: true, Required: false},
 				{Name: "Software Management", Description: "Flatpak support", Function: "install_software_management", Selected: false, Required: false},
 				{Name: "Fonts", Description: "Essential and programming fonts", Function: "install_fonts", Selected: true, Required: false},
 				{Name: "Zsh Shell", Description: "Z shell with plugins and configuration", Function: "setup_zsh", Selected: true, Required: false},
-				{Name: "Wallpapers", Description: "Setup wallpapers and themes", Function: "setup_wallpapers", Selected: true, Required: false},
-				{Name: "Fastfetch", Description: "System information display tool", Function: "setup_fastfetch", Selected: true, Required: false},
 				{Name: "Dotfiles", Description: "Copy configuration files", Function: "copy_dotfiles", Selected: true, Required: true},
 			},
 		},
@@ -387,50 +403,53 @@ func (m model) View() string {
 
 	result.WriteString(titleStyle.Render("🚀 Dotfiles Installer"))
 	result.WriteString("\n")
-	result.WriteString("Use ←→ to navigate categories, ↑↓ to navigate options, SPACE to toggle, ENTER to install\n\n")
+	result.WriteString("Use ←→ to switch tabs, ↑↓ to navigate packages, SPACE to toggle, ENTER to install\n\n")
 
+	// Render horizontal tabs
+	var tabs []string
 	for catIndex, category := range m.categories {
 		if catIndex == m.currentCategory {
-			result.WriteString(selectedStyle.Render("▶ " + category.Name))
+			tabs = append(tabs, tabActiveStyle.Render(category.Name))
 		} else {
-			result.WriteString(categoryStyle.Render("  " + category.Name))
+			tabs = append(tabs, tabInactiveStyle.Render(category.Name))
+		}
+	}
+	result.WriteString(strings.Join(tabs, ""))
+	result.WriteString("\n\n")
+
+	// Render current category content
+	currentCategory := m.categories[m.currentCategory]
+	
+	// Category header
+	result.WriteString(categoryStyle.Render("📦 " + currentCategory.Name))
+	result.WriteString("\n\n")
+
+	// Package list for current category
+	for stepIndex, step := range currentCategory.Steps {
+		var checkbox string
+
+		if step.Required {
+			checkbox = "[●]"
+		} else if m.selectedSteps[step.Function] {
+			checkbox = "[✓]"
+		} else {
+			checkbox = "[ ]"
+		}
+
+		if stepIndex == m.currentStep {
+			result.WriteString(selectedStyle.Render("▶ " + checkbox + " " + step.Name))
+			result.WriteString("\n")
+			result.WriteString(descriptionStyle.Render("  " + step.Description))
+		} else {
+			if step.Required {
+				result.WriteString(successStyle.Render("  " + checkbox + " " + step.Name))
+			} else if m.selectedSteps[step.Function] {
+				result.WriteString(successStyle.Render("  " + checkbox + " " + step.Name))
+			} else {
+				result.WriteString(unselectedStyle.Render("  " + checkbox + " " + step.Name))
+			}
 		}
 		result.WriteString("\n")
-
-		if catIndex == m.currentCategory {
-			for stepIndex, step := range category.Steps {
-				var prefix, checkbox string
-
-				if step.Required {
-					checkbox = "[●]"
-				} else if m.selectedSteps[step.Function] {
-					checkbox = "[✓]"
-				} else {
-					checkbox = "[ ]"
-				}
-
-				if stepIndex == m.currentStep {
-					prefix = "  ▶ "
-					result.WriteString(selectedStyle.Render(prefix + checkbox + " " + step.Name))
-				} else {
-					prefix = "    "
-					if step.Required {
-						result.WriteString(successStyle.Render(prefix + checkbox + " " + step.Name))
-					} else if m.selectedSteps[step.Function] {
-						result.WriteString(successStyle.Render(prefix + checkbox + " " + step.Name))
-					} else {
-						result.WriteString(unselectedStyle.Render(prefix + checkbox + " " + step.Name))
-					}
-				}
-				result.WriteString("\n")
-
-				if stepIndex == m.currentStep {
-					result.WriteString(descriptionStyle.Render(step.Description))
-					result.WriteString("\n")
-				}
-			}
-			result.WriteString("\n")
-		}
 	}
 
 	result.WriteString("\n")
