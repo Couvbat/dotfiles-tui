@@ -5,8 +5,9 @@ echo "Building dotfiles TUI installer..."
 
 # Check if Go is installed
 if ! command -v go &> /dev/null; then
-    echo "Go is not installed. Please install Go first."
-    echo "Visit: https://golang.org/doc/install"
+    echo "❌ Go is not installed."
+    echo "💡 Run './install-tui.sh' instead - it will install Go automatically"
+    echo "Or install Go manually: https://golang.org/doc/install"
     exit 1
 fi
 

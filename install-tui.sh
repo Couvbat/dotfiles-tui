@@ -11,12 +11,21 @@ if [ ! -f "lib/packages.sh" ]; then
     exit 1
 fi
 
-# Check if Go is installed
+# Source utilities to access validation functions
+source lib/utils.sh
+
+# Validate and auto-install system requirements (including Go)
+echo "🔍 Checking system requirements..."
+validate_system_requirements
+
+# Double-check that Go is now available
 if ! command -v go &> /dev/null; then
-    echo "❌ Error: Go is not installed."
-    echo "Please install Go first: https://golang.org/doc/install"
+    echo "❌ Error: Go installation failed or is not in PATH."
+    echo "Please install Go manually: https://golang.org/doc/install"
     exit 1
 fi
+
+echo "✅ All system requirements satisfied"
 
 if ! ./fix-permissions.sh; then
     echo "❌ Failed to fix permissions"
