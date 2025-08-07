@@ -22,6 +22,7 @@ install_packages() {
         "curl"
         "gcc"
         "sed"
+        "go"
         "networkmanager"
         "pipewire"
         "pipewire-pulse"

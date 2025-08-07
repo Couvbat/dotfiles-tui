@@ -57,10 +57,9 @@ validate_network() {
     fi
 }
 
-# Validate that essential commands exist and auto-install if missing
 validate_system_requirements() {
     local missing_commands=()
-    local required_commands=("pacman" "git" "curl" "wget")
+    local required_commands=("pacman" "git" "curl" "wget" "go")
     
     # Check which commands are missing
     for cmd in "${required_commands[@]}"; do
@@ -88,6 +87,7 @@ validate_system_requirements() {
                 "git") packages_to_install+=("git") ;;
                 "curl") packages_to_install+=("curl") ;;
                 "wget") packages_to_install+=("wget") ;;
+                "go") packages_to_install+=("go") ;;
             esac
         done
         
