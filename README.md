@@ -36,6 +36,7 @@ cd dotfiles
 - **Interactive TUI**: Modern terminal-based interface with selective component installation
 - **Modular Design**: Choose specific packages, applications, and configurations
 - **Graphics Driver Support**: Comprehensive NVIDIA and AMD driver options
+- **Virtualization Support**: QEMU/KVM, VirtualBox, VMware tools, and container runtimes
 - **Application Categories**: Organized installation of development tools, browsers, entertainment apps, and more
 - **Safe Installation**: Install only what you need with clear feedback
 

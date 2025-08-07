@@ -45,6 +45,15 @@ A beautiful Terminal User Interface (TUI) installer for your dotfiles, built wit
 ### Gaming
 - Steam (with GPU-specific 32-bit libraries)
 
+### Virtualization
+- QEMU/KVM - Complete virtualization stack with virt-manager GUI
+- VirtualBox - Oracle VirtualBox with host modules and kernel support
+- VMware Tools - Open-source VMware tools for compatibility
+- Container Runtimes - Podman, Buildah, and rootless container support
+- Virtualization Dev Tools - Vagrant, Packer, Terraform, Ansible (AUR packages)
+- Wine - Windows application compatibility layer
+- Virtualization Support Check - Verify hardware capabilities
+
 ### Terminal Applications
 - Terminal Emulator (Kitty) - GPU-accelerated terminal
 - System Monitor (btop) - Modern resource monitor
