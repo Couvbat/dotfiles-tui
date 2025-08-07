@@ -18,6 +18,11 @@ if ! command -v go &> /dev/null; then
     exit 1
 fi
 
+if ! ./fix-permissions.sh; then
+    echo "❌ Failed to fix permissions"
+    exit 1
+fi
+
 # Check if the installer binary exists
 if [ ! -f "dotfiles-installer" ]; then
     echo "📦 Building TUI installer..."
