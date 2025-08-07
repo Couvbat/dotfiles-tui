@@ -47,8 +47,12 @@ _installAurPackages() {
 _installParu() {
     echo "🔧 Installing paru AUR helper..."
     
-    # Ensure base-devel is installed
-    _installPackages "base-devel"
+    # Ensure base-devel and rust are installed
+    if ! _installPackages "base-devel" "rust"; then
+        echo "❌ Error: Failed to install build dependencies"
+        FAILED_STEPS+=("Failed to install paru dependencies")
+        return 1
+    fi
     
     # Create secure temporary directory
     local temp_path
@@ -64,7 +68,7 @@ _installParu() {
     fi
     
     # Build and install paru
-    if (cd "$temp_path/paru" && makepkg -si --noconfirm); then
+    if (cd "$temp_path/paru" && makepkg -si --noconfirm --needed); then
         echo "✅ paru installed successfully"
     else
         echo "❌ Error: Failed to build/install paru"

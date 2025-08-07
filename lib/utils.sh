@@ -57,21 +57,50 @@ validate_network() {
     fi
 }
 
-# Validate that essential commands exist
+# Validate that essential commands exist and auto-install if missing
 validate_system_requirements() {
     local missing_commands=()
     local required_commands=("pacman" "git" "curl" "wget")
     
+    # Check which commands are missing
     for cmd in "${required_commands[@]}"; do
         if ! command -v "$cmd" &>/dev/null; then
             missing_commands+=("$cmd")
         fi
     done
     
+    # Auto-install missing commands (except pacman which should always be present)
     if [[ ${#missing_commands[@]} -gt 0 ]]; then
-        echo "❌ Error: Missing required commands: ${missing_commands[*]}"
-        echo "   Please install the missing commands and try again."
-        exit 1
+        echo "📦 Missing required commands: ${missing_commands[*]}"
+        
+        # Check if pacman is missing (critical error)
+        if [[ " ${missing_commands[*]} " =~ " pacman " ]]; then
+            echo "❌ Error: pacman is not available. This script requires Arch Linux."
+            exit 1
+        fi
+        
+        # Install missing packages
+        echo "🔧 Installing missing packages..."
+        local packages_to_install=()
+        
+        for cmd in "${missing_commands[@]}"; do
+            case "$cmd" in
+                "git") packages_to_install+=("git") ;;
+                "curl") packages_to_install+=("curl") ;;
+                "wget") packages_to_install+=("wget") ;;
+            esac
+        done
+        
+        if [[ ${#packages_to_install[@]} -gt 0 ]]; then
+            echo "   Installing: ${packages_to_install[*]}"
+            if sudo pacman -S --noconfirm "${packages_to_install[@]}"; then
+                echo "✅ Successfully installed missing packages"
+            else
+                echo "❌ Error: Failed to install required packages"
+                echo "   Please run: sudo pacman -S ${packages_to_install[*]}"
+                exit 1
+            fi
+        fi
     fi
 }
 

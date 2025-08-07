@@ -16,17 +16,27 @@ install_mongodb() {
     if ! _checkCommandExists mongod; then
         echo "📦 Installing MongoDB from AUR..."
         if _checkCommandExists paru; then
-            if paru -S --noconfirm mongodb-bin; then
+            echo "🔄 Attempting to install mongodb-bin..."
+            if paru -S --noconfirm --skipreview mongodb-bin; then
                 echo "✅ MongoDB installed successfully"
                 enable_service "mongodb.service"
             else
-                echo "❌ Error: Failed to install MongoDB"
-                FAILED_STEPS+=("MongoDB installation failed")
-                return 1
+                echo "⚠️  mongodb-bin failed, trying mongodb-community..."
+                if paru -S --noconfirm --skipreview mongodb-community; then
+                    echo "✅ MongoDB Community installed successfully"
+                    enable_service "mongodb.service"
+                else
+                    echo "❌ Error: Failed to install MongoDB"
+                    echo "ℹ️  You can manually install MongoDB later with:"
+                    echo "   paru -S mongodb-bin"
+                    FAILED_STEPS+=("MongoDB build not found")
+                    return 1
+                fi
             fi
         else
             echo "❌ Error: paru is required for MongoDB installation"
-            FAILED_STEPS+=("MongoDB: paru not found")
+            echo "ℹ️  Install paru first, then run: paru -S mongodb-bin"
+            FAILED_STEPS+=("Failed to install paru AUR helper")
             return 1
         fi
     else

@@ -27,8 +27,18 @@ setup_zsh() {
     # Change default shell to zsh
     if [[ "$SHELL" != "/bin/zsh" ]] && [[ "$SHELL" != "/usr/bin/zsh" ]]; then
         echo "🔧 Changing default shell to ZSH..."
-        if chsh -s "$(which zsh)"; then
+        local zsh_path
+        zsh_path=$(which zsh)
+        
+        # Check if zsh is in /etc/shells
+        if ! grep -q "$zsh_path" /etc/shells; then
+            echo "📝 Adding $zsh_path to /etc/shells..."
+            echo "$zsh_path" | sudo tee -a /etc/shells
+        fi
+        
+        if sudo chsh -s "$zsh_path" "$USER"; then
             echo "✅ Default shell changed to ZSH"
+            echo "ℹ️  Please log out and back in for the shell change to take effect"
         else
             echo "❌ Failed to change default shell"
             FAILED_STEPS+=("Failed to change shell to ZSH")
@@ -103,12 +113,5 @@ install_zsh_plugins() {
         fi
     else
         echo "✅ zsh-autosuggestions already installed"
-    fi
-}
-        git clone https://github.com/zdharma-continuum/fast-syntax-highlighting "$HOME/.oh-my-zsh/plugins/fast-syntax-highlighting"
-    fi
-
-    if [ ! -d "$HOME/.oh-my-zsh/plugins/zsh-autosuggestions" ]; then
-        git clone https://github.com/zsh-users/zsh-autosuggestions "$HOME/.oh-my-zsh/plugins/zsh-autosuggestions"
     fi
 }

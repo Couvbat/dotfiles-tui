@@ -77,8 +77,12 @@ install_virtualbox_guest() {
     
     local vbox_guest_packages=(
         "virtualbox-guest-utils"    # VirtualBox guest utilities
-        "xf86-video-vmware"         # VMware/VirtualBox graphics driver
     )
+    
+    # Only add graphics driver if we're actually in VirtualBox
+    if [[ "$virt_type" == "oracle" ]] || [[ "$virt_type" == "virtualbox" ]]; then
+        vbox_guest_packages+=("xf86-video-vmware")
+    fi
     
     if _installPackages "${vbox_guest_packages[@]}"; then
         echo "✅ VirtualBox Guest Additions installed successfully"
