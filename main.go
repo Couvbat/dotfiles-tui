@@ -405,17 +405,52 @@ func (m model) View() string {
 	result.WriteString("\n")
 	result.WriteString("Use ←→ to switch tabs, ↑↓ to navigate packages, SPACE to toggle, ENTER to install\n\n")
 
-	// Render horizontal tabs
+	// Render horizontal tabs with scrolling
+	const maxVisibleTabs = 5
+	tabStart := m.currentCategory - maxVisibleTabs/2
+	if tabStart < 0 {
+		tabStart = 0
+	}
+	tabEnd := tabStart + maxVisibleTabs
+	if tabEnd > len(m.categories) {
+		tabEnd = len(m.categories)
+		tabStart = tabEnd - maxVisibleTabs
+		if tabStart < 0 {
+			tabStart = 0
+		}
+	}
+
 	var tabs []string
-	for catIndex, category := range m.categories {
+	
+	// Left scroll indicator
+	if tabStart > 0 {
+		tabs = append(tabs, tabInactiveStyle.Render("◀"))
+	}
+	
+	// Visible tabs
+	for catIndex := tabStart; catIndex < tabEnd; catIndex++ {
+		category := m.categories[catIndex]
 		if catIndex == m.currentCategory {
 			tabs = append(tabs, tabActiveStyle.Render(category.Name))
 		} else {
 			tabs = append(tabs, tabInactiveStyle.Render(category.Name))
 		}
 	}
+	
+	// Right scroll indicator
+	if tabEnd < len(m.categories) {
+		tabs = append(tabs, tabInactiveStyle.Render("▶"))
+	}
+	
 	result.WriteString(strings.Join(tabs, ""))
-	result.WriteString("\n\n")
+	result.WriteString("\n")
+	
+	// Tab navigation hint
+	if len(m.categories) > maxVisibleTabs {
+		result.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#6B7280")).Render(
+			fmt.Sprintf("Tab %d/%d - Use ←→ to navigate", m.currentCategory+1, len(m.categories))))
+	}
+	result.WriteString("\n")
 
 	// Render current category content
 	currentCategory := m.categories[m.currentCategory]
