@@ -3,14 +3,28 @@
 # Load shared utilities
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
+# Prevent multiple loading
+if [[ "${APPS_LOADED:-}" == "1" ]]; then
+    return 0
+fi
+readonly APPS_LOADED=1
+
 # Array to track failed steps
 FAILED_STEPS=()
 
-# System configuration paths
-readonly MKINITCPIO_CONF="/etc/mkinitcpio.conf"
-readonly GRUB_DEFAULT="/etc/default/grub"
-readonly GRUB_CONFIG="/boot/grub/grub.cfg"
-readonly NVIDIA_MODPROBE_CONF="/etc/modprobe.d/nvidia.conf"
+# System configuration paths (only set if not already defined)
+if [[ -z "${MKINITCPIO_CONF:-}" ]]; then
+    readonly MKINITCPIO_CONF="/etc/mkinitcpio.conf"
+fi
+if [[ -z "${GRUB_DEFAULT:-}" ]]; then
+    readonly GRUB_DEFAULT="/etc/default/grub"
+fi
+if [[ -z "${GRUB_CONFIG:-}" ]]; then
+    readonly GRUB_CONFIG="/boot/grub/grub.cfg"
+fi
+if [[ -z "${NVIDIA_MODPROBE_CONF:-}" ]]; then
+    readonly NVIDIA_MODPROBE_CONF="/etc/modprobe.d/nvidia.conf"
+fi
 
 # Function to install NVIDIA DKMS drivers
 install_nvidia_dkms() {
@@ -736,6 +750,80 @@ install_entertainment_apps() {
     install_cbonsai
     install_pipes_rs
     install_astroterm
+}
+
+# Add missing application installation functions
+install_neovim() {
+    echo "📝 Installing Neovim..."
+    if ! _isInstalled "neovim"; then
+        _installPackages "neovim"
+    else
+        echo "✅ Neovim is already installed."
+    fi
+}
+
+install_git() {
+    echo "📚 Installing Git..."
+    if ! _isInstalled "git"; then
+        _installPackages "git"
+    else
+        echo "✅ Git is already installed."
+    fi
+}
+
+install_terminal_emulator() {
+    echo "💻 Installing Terminal Emulator (Kitty)..."
+    if ! _isInstalled "kitty"; then
+        _installPackages "kitty"
+    else
+        echo "✅ Kitty is already installed."
+    fi
+}
+
+install_system_monitor() {
+    echo "📊 Installing System Monitor (btop)..."
+    if ! _isInstalled "btop"; then
+        _installPackages "btop"
+    else
+        echo "✅ btop is already installed."
+    fi
+}
+
+install_bat() {
+    echo "🦇 Installing bat..."
+    if ! _isInstalled "bat"; then
+        _installPackages "bat"
+    else
+        echo "✅ bat is already installed."
+    fi
+}
+
+install_tldr() {
+    echo "📖 Installing tldr..."
+    if ! _isInstalled "tldr"; then
+        _installPackages "tldr"
+    else
+        echo "✅ tldr is already installed."
+    fi
+}
+
+install_onefetch() {
+    echo "🐙 Installing onefetch..."
+    if ! _isInstalled "onefetch"; then
+        _installPackages "onefetch"
+    else
+        echo "✅ onefetch is already installed."
+    fi
+}
+
+install_nautilus() {
+    echo "📁 Installing Nautilus..."
+    if ! _isInstalled "nautilus"; then
+        _installPackages "nautilus"
+    else
+        echo "✅ Nautilus is already installed."
+    fi
+}
 }
 
 # System Configuration Functions

@@ -6,6 +6,12 @@
 # This script handles AUR helper installation and AUR package management
 # Uses shared utilities for security and consistency
 
+# Prevent multiple loading
+if [[ "${AUR_LOADED:-}" == "1" ]]; then
+    return 0
+fi
+readonly AUR_LOADED=1
+
 # Source shared utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils.sh"

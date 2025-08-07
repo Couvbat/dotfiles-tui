@@ -6,10 +6,22 @@
 # This file contains common functions used across multiple installation scripts
 # to eliminate code duplication and ensure consistency.
 
-# Global variables for consistent paths
-readonly BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
-readonly CONFIG_DIR="$HOME/.config"
-readonly TEMP_BASE="/tmp/dotfiles_install_$$"
+# Prevent multiple loading
+if [[ "${UTILS_LOADED:-}" == "1" ]]; then
+    return 0
+fi
+readonly UTILS_LOADED=1
+
+# Global variables for consistent paths (only set if not already defined)
+if [[ -z "${BACKUP_DIR:-}" ]]; then
+    readonly BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
+fi
+if [[ -z "${CONFIG_DIR:-}" ]]; then
+    readonly CONFIG_DIR="$HOME/.config"
+fi
+if [[ -z "${TEMP_BASE:-}" ]]; then
+    readonly TEMP_BASE="/tmp/dotfiles_install_$$"
+fi
 
 # =============================================================================
 # VALIDATION FUNCTIONS
