@@ -1,0 +1,89 @@
+/*
+#  ____        __ _  
+# |  _ \ ___  / _(_) 
+# | |_) / _ \| |_| | 
+# |  _ < (_) |  _| | 
+# |_| \_\___/|_| |_| 
+#                    
+# by Stephan Raabe (2023) 
+# ----------------------------------------------------- 
+*/
+
+/* ---- Configuration ---- */
+configuration {
+    modi:                       "run";
+    font:                       "Fira Sans 11";
+    show-icons:                 false;
+}
+
+/* ---- Load font ---- */
+@import "~/.config/ml4w/settings/rofi-font.rasi"
+
+/* ---- Load pywal colors (custom wal template) ---- */
+@theme "~/.cache/wal/colors-rofi-pywal"
+
+/* ---- Load border width ---- */
+@import "~/.config/ml4w/settings/rofi-border.rasi"
+
+/* ---- Load border radius ---- */
+@import "~/.config/ml4w/settings/rofi-border-radius.rasi"
+
+// Main //
+window {
+    width:                        30em;
+    x-offset:                     -2em;
+    y-offset:                     2em;
+    spacing:                      0px;
+    padding:                      0px;
+    margin:                       0px; 
+    color:                        #FFFFFF;
+    border:                       @border-width;
+    border-color:                 @color11;
+    cursor:                       "default";
+    transparency:                 "real";
+    location:                     northeast;
+    anchor:                       northeast;
+    fullscreen:                   false;
+    enabled:                      true;
+    border-radius:                @border-radius;
+    background-color:             transparent;
+}
+
+mainbox {
+    enabled:                     true;
+    spacing:                     0em;
+    padding:                     0em;
+    orientation:                 horizontal;
+    children:                    [ "inputbar" ];
+    background-color:            transparent;
+}
+
+// Inputs //
+inputbar {
+    enabled:                     true;
+    spacing:                     0em;
+    padding:                     1em;
+    children:                    [ "textbox-prompt-colon", "entry" ];
+    background-color:            transparent;
+    expand:                      true;
+}
+
+textbox-prompt-colon {
+    enabled:                     true;
+    expand:                      false;
+    str:                         "  ";
+    padding:                     1em 1em 0em 0em;
+    text-color:                  @foreground;
+    border-radius:               2em 0em 0em 2em;
+    background-color:            @background;
+}
+
+entry {
+    enabled:                     true;
+    border-radius:               0em 2em 2em 0em;
+    spacing:                     1em;
+    padding:                     1em;
+    background-color:            @background;
+    text-color:                  @foreground;
+    expand:                      true;
+}

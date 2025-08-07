@@ -1,0 +1,1 @@
+kitty zsh -c spf

@@ -1,0 +1,25 @@
+# -----------------------------------------------------
+# AUTOSTART
+# -----------------------------------------------------
+
+# -----------------------------------------------------
+# Pywal
+# -----------------------------------------------------
+cat ~/.cache/wal/sequences
+
+# -----------------------------------------------------
+# Fastfetch
+# -----------------------------------------------------
+if [[ $(tty) == *"pts"* ]]; then
+    clear && fastfetch --config /usr/share/fastfetch/presets/examples/13.jsonc --raw ~/Images/logo.bin
+    # clear && jp2a --colors --size=36x12 ~/Images/logo2.png | fastfetch --config /usr/share/fastfetch/presets/examples/13.jsonc --file-raw -
+    # pokemon-colorscripts -r
+else
+    echo
+    if [ -f /bin/qtile ]; then
+        echo "Start Qtile X11 with command Qtile"
+    fi
+    if [ -f /bin/hyprctl ]; then
+        echo "Start Hyprland with command Hyprland"
+    fi
+fi

@@ -1,0 +1,30 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www/html
+    
+  php:
+    build:
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - .:/var/www/html
+  db:
+    build:
+      dockerfile: docker/db/Dockerfile
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: odin
+      MARIADB_USER: root
+      MARIADB_PASSWORD: root
+    volumes:
+      - database_data:/var/lib/mysql
+
+volumes:
+  database_data:
+    driver: local
