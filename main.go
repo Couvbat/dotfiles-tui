@@ -98,6 +98,13 @@ type model struct {
 func initialModel() model {
 	categories := []Category{
 		{
+			Name: "Prerequisites",
+			Steps: []InstallStep{
+				{Name: "Core Packages", Description: "Essential system packages and dependencies", Function: "install_packages", Selected: true, Required: true},
+				{Name: "AUR Helper (paru)", Description: "Install paru AUR helper for AUR packages", Function: "install_aur_helper", Selected: true, Required: true},
+			},
+		},
+		{
 			Name: "Graphics Drivers",
 			Steps: []InstallStep{
 				{Name: "NVIDIA Drivers", Description: "Install NVIDIA drivers (will prompt for DKMS, Open, or Nouveau options)", Function: "configure_nvidia", Selected: false, Required: false},
@@ -208,8 +215,6 @@ func initialModel() model {
 		{
 			Name: "System Configuration",
 			Steps: []InstallStep{
-				{Name: "Core Packages", Description: "Essential system packages and dependencies", Function: "install_packages", Selected: true, Required: true},
-				{Name: "AUR Helper (paru)", Description: "Install paru AUR helper only", Function: "install_aur_helper", Selected: true, Required: true},
 				{Name: "Hyprland WM", Description: "Wayland compositor and window manager", Function: "install_hyprland_wm", Selected: true, Required: false},
 				{Name: "Desktop Portals", Description: "XDG desktop portals for app integration", Function: "install_desktop_portals", Selected: true, Required: false},
 				{Name: "SDDM Login Manager", Description: "Display manager with themes", Function: "install_display_manager", Selected: true, Required: false},

@@ -324,12 +324,82 @@ install_vscode() {
 
 # Function to install Neovim
 install_neovim() {
-    echo "✅ Neovim will be installed with core packages."
+    echo "📝 Installing Neovim..."
+    if ! _isInstalled "neovim"; then
+        _installPackages "neovim"
+    else
+        echo "✅ Neovim is already installed."
+    fi
 }
 
 # Function to install Git
 install_git() {
-    echo "✅ Git will be installed with core packages."
+    echo "📚 Installing Git..."
+    if ! _isInstalled "git"; then
+        _installPackages "git"
+    else
+        echo "✅ Git is already installed."
+    fi
+}
+
+# Function to install terminal emulator
+install_terminal_emulator() {
+    echo "💻 Installing Terminal Emulator (Kitty)..."
+    if ! _isInstalled "kitty"; then
+        _installPackages "kitty"
+    else
+        echo "✅ Kitty is already installed."
+    fi
+}
+
+# Function to install system monitor
+install_system_monitor() {
+    echo "📊 Installing System Monitor (btop)..."
+    if ! _isInstalled "btop"; then
+        _installPackages "btop"
+    else
+        echo "✅ btop is already installed."
+    fi
+}
+
+# Function to install bat (better cat)
+install_bat() {
+    echo "🦇 Installing bat..."
+    if ! _isInstalled "bat"; then
+        _installPackages "bat"
+    else
+        echo "✅ bat is already installed."
+    fi
+}
+
+# Function to install tldr (simplified man pages)
+install_tldr() {
+    echo "📖 Installing tldr..."
+    if ! _isInstalled "tldr"; then
+        _installPackages "tldr"
+    else
+        echo "✅ tldr is already installed."
+    fi
+}
+
+# Function to install onefetch (git repo info)
+install_onefetch() {
+    echo "🐙 Installing onefetch..."
+    if ! _isInstalled "onefetch"; then
+        _installPackages "onefetch"
+    else
+        echo "✅ onefetch is already installed."
+    fi
+}
+
+# Function to install Nautilus file manager
+install_nautilus() {
+    echo "📁 Installing Nautilus..."
+    if ! _isInstalled "nautilus"; then
+        _installPackages "nautilus"
+    else
+        echo "✅ Nautilus is already installed."
+    fi
 }
 
 # Function to install Docker
@@ -750,79 +820,6 @@ install_entertainment_apps() {
     install_cbonsai
     install_pipes_rs
     install_astroterm
-}
-
-# Add missing application installation functions
-install_neovim() {
-    echo "📝 Installing Neovim..."
-    if ! _isInstalled "neovim"; then
-        _installPackages "neovim"
-    else
-        echo "✅ Neovim is already installed."
-    fi
-}
-
-install_git() {
-    echo "📚 Installing Git..."
-    if ! _isInstalled "git"; then
-        _installPackages "git"
-    else
-        echo "✅ Git is already installed."
-    fi
-}
-
-install_terminal_emulator() {
-    echo "💻 Installing Terminal Emulator (Kitty)..."
-    if ! _isInstalled "kitty"; then
-        _installPackages "kitty"
-    else
-        echo "✅ Kitty is already installed."
-    fi
-}
-
-install_system_monitor() {
-    echo "📊 Installing System Monitor (btop)..."
-    if ! _isInstalled "btop"; then
-        _installPackages "btop"
-    else
-        echo "✅ btop is already installed."
-    fi
-}
-
-install_bat() {
-    echo "🦇 Installing bat..."
-    if ! _isInstalled "bat"; then
-        _installPackages "bat"
-    else
-        echo "✅ bat is already installed."
-    fi
-}
-
-install_tldr() {
-    echo "📖 Installing tldr..."
-    if ! _isInstalled "tldr"; then
-        _installPackages "tldr"
-    else
-        echo "✅ tldr is already installed."
-    fi
-}
-
-install_onefetch() {
-    echo "🐙 Installing onefetch..."
-    if ! _isInstalled "onefetch"; then
-        _installPackages "onefetch"
-    else
-        echo "✅ onefetch is already installed."
-    fi
-}
-
-install_nautilus() {
-    echo "📁 Installing Nautilus..."
-    if ! _isInstalled "nautilus"; then
-        _installPackages "nautilus"
-    else
-        echo "✅ Nautilus is already installed."
-    fi
 }
 }
 
