@@ -28,23 +28,7 @@ var (
 			Foreground(lipgloss.Color("#A1A1AA")).
 			Padding(0, 1)
 
-	tabActiveStyle = li	# Add selected installation steps
-	for _, category := range m.categories {
-		for _, step := range category.Steps {
-			if step.Required || m.selectedSteps[step.Function] {
-				scriptContent.WriteString(fmt.Sprintf("echo \"=== Installing: %s ===\"\n", step.Name))
-				scriptContent.WriteString("set +e  # Allow individual steps to fail\n")
-				scriptContent.WriteString(fmt.Sprintf("%s\n", step.Function))
-				scriptContent.WriteString("STEP_EXIT_CODE=$?\n")
-				scriptContent.WriteString("if [ $STEP_EXIT_CODE -ne 0 ]; then\n")
-				scriptContent.WriteString(fmt.Sprintf("    echo \"❌ Warning: %s failed with exit code $STEP_EXIT_CODE\"\n", step.Name))
-				scriptContent.WriteString(fmt.Sprintf("    FAILED_STEPS+=(\"%s\")\n", step.Name))
-				scriptContent.WriteString("fi\n")
-				scriptContent.WriteString("set -e  # Re-enable exit on error\n")
-				scriptContent.WriteString("echo\n")
-			}
-		}
-	}Style().
+	tabActiveStyle = lipgloss.NewStyle().
 			Bold(true).
 			Background(lipgloss.Color("#7C3AED")).
 			Foreground(lipgloss.Color("#FFFFFF")).
@@ -573,7 +557,14 @@ func (m model) runInstallation() {
 		for _, step := range category.Steps {
 			if step.Required || m.selectedSteps[step.Function] {
 				scriptContent.WriteString(fmt.Sprintf("echo \"=== Installing: %s ===\"\n", step.Name))
+				scriptContent.WriteString("set +e  # Allow individual steps to fail\n")
 				scriptContent.WriteString(fmt.Sprintf("%s\n", step.Function))
+				scriptContent.WriteString("STEP_EXIT_CODE=$?\n")
+				scriptContent.WriteString("if [ $STEP_EXIT_CODE -ne 0 ]; then\n")
+				scriptContent.WriteString(fmt.Sprintf("    echo \"❌ Warning: %s failed with exit code $STEP_EXIT_CODE\"\n", step.Name))
+				scriptContent.WriteString(fmt.Sprintf("    FAILED_STEPS+=(\"%s\")\n", step.Name))
+				scriptContent.WriteString("fi\n")
+				scriptContent.WriteString("set -e  # Re-enable exit on error\n")
 				scriptContent.WriteString("echo\n")
 			}
 		}
