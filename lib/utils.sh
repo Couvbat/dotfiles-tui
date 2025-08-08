@@ -198,6 +198,9 @@ _installPackages() {
     if [[ ${#toInstall[@]} -gt 0 ]]; then
         echo "🚀 Installing ${#toInstall[@]} package(s): ${toInstall[*]}"
         
+        # Refresh sudo timestamp to prevent timeout
+        sudo -v
+        
         # Update package database first
         if ! sudo pacman -Sy; then
             echo "⚠️  Warning: Failed to update package database"

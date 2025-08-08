@@ -74,13 +74,14 @@ _installParu() {
         return 1
     fi
     
-    # Build and install paru (redirect output to avoid interference)
+    # Build and install paru (show output for debugging)
     echo "🔨 Building paru..."
-    if (cd "$temp_path/paru" && makepkg -si --noconfirm --needed > /dev/null 2>&1); then
+    if (cd "$temp_path/paru" && makepkg -si --noconfirm --needed); then
         echo "✅ paru installed successfully"
         rm -rf "$temp_path"
     else
         echo "❌ Error: Failed to build/install paru"
+        echo "ℹ️  Check the output above for specific build errors"
         rm -rf "$temp_path"
         FAILED_STEPS+=("Failed to build paru")
         return 1
