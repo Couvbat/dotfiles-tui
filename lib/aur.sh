@@ -60,29 +60,31 @@ _installParu() {
         return 1
     fi
     
-    # Create secure temporary directory
-    local temp_path
-    temp_path=$(create_temp_dir)
+    # Create secure temporary directory with simpler path
+    local temp_path="/tmp/paru_install_$$"
+    mkdir -p "$temp_path"
     
     echo "📁 Using temporary directory: $temp_path"
     
     # Clone paru repository
     if ! git clone https://aur.archlinux.org/paru.git "$temp_path/paru"; then
         echo "❌ Error: Failed to clone paru repository"
+        rm -rf "$temp_path"
         FAILED_STEPS+=("Failed to clone paru repository")
         return 1
     fi
     
-    # Build and install paru
-    if (cd "$temp_path/paru" && makepkg -si --noconfirm --needed); then
+    # Build and install paru (redirect output to avoid interference)
+    echo "🔨 Building paru..."
+    if (cd "$temp_path/paru" && makepkg -si --noconfirm --needed > /dev/null 2>&1); then
         echo "✅ paru installed successfully"
+        rm -rf "$temp_path"
     else
         echo "❌ Error: Failed to build/install paru"
+        rm -rf "$temp_path"
         FAILED_STEPS+=("Failed to build paru")
         return 1
     fi
-    
-    # Cleanup happens automatically via trap in create_temp_dir
 }
 
 # TUI-compatible function: Only install AUR helper

@@ -271,17 +271,25 @@ create_temp_dir() {
         exit 1
     fi
     
-    # Set up cleanup trap
-    trap "cleanup_temp_dir '$temp_dir'" EXIT
+    # Set up cleanup trap (but suppress output during critical operations)
+    trap "cleanup_temp_dir_silent '$temp_dir'" EXIT
     echo "$temp_dir"
 }
 
-# Clean up temporary directory
+# Clean up temporary directory (with output)
 cleanup_temp_dir() {
     local temp_dir="$1"
     if [[ -n "$temp_dir" && -d "$temp_dir" ]]; then
-        rm -rf "$temp_dir"
+        rm -rf "$temp_dir" 2>/dev/null
         echo "🧹 Cleaned up temporary directory: $temp_dir"
+    fi
+}
+
+# Clean up temporary directory (silent for critical operations)
+cleanup_temp_dir_silent() {
+    local temp_dir="$1"
+    if [[ -n "$temp_dir" && -d "$temp_dir" ]]; then
+        rm -rf "$temp_dir" 2>/dev/null
     fi
 }
 
