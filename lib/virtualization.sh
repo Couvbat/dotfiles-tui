@@ -66,23 +66,15 @@ install_qemu_kvm() {
 install_virtualbox_guest() {
     echo "🔧 Installing VirtualBox Guest Additions..."
     
-    # Check if we're running in VirtualBox
-    local virt_type=$(systemd-detect-virt 2>/dev/null || echo "none")
-    if [[ "$virt_type" != "oracle" ]] && [[ "$virt_type" != "virtualbox" ]]; then
-        echo "⚠️  Warning: Not running in VirtualBox VM, but installing anyway"
-        echo "ℹ️  VirtualBox Guest Additions will be available if you migrate to VirtualBox"
-    else
+        # Check VM environment and install appropriate drivers
+    if vm_env_check | grep -q "VirtualBox"; then
         echo "✅ VirtualBox environment detected"
-    fi
-    
-    local vbox_guest_packages=(
-        "virtualbox-guest-utils"    # VirtualBox guest utilities
-    )
-    
-    # Only add graphics driver if we're actually in VirtualBox
-    if [[ "$virt_type" == "oracle" ]] || [[ "$virt_type" == "virtualbox" ]]; then
-        vbox_guest_packages+=("xf86-video-vmware")
-    fi
+        vbox_guest_packages=(
+            "virtualbox-guest-utils"
+            "mesa"                # 3D acceleration and graphics support
+            "xorg-server"         # X.Org display server
+            "xorg-xinit"          # X.Org initialization
+        )
     
     if _installPackages "${vbox_guest_packages[@]}"; then
         echo "✅ VirtualBox Guest Additions installed successfully"
